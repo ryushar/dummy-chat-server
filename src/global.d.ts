@@ -8,6 +8,7 @@ type TMessageAttachment = {
 
 type TReaction = {
   uuid: string;
+  participantUuid: string;
   value: string;
 };
 

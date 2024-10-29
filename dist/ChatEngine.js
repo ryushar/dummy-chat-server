@@ -176,8 +176,11 @@ const ChatEngine = new (class {
             message.text = faker_1.faker.lorem.sentence({ min: 1, max: 40 });
         }
         else {
+            const index = Math.floor(Math.random() * this._participants.length);
+            const participant = this._participants[index];
             message.reactions.push({
                 uuid: (0, uuid_1.v4)(),
+                participantUuid: participant.uuid,
                 value: faker_1.faker.internet.emoji({ types: ["smiley", "flag", "food"] }),
             });
         }
