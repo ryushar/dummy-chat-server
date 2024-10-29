@@ -178,7 +178,7 @@ const ChatEngine = new (class {
     } else {
       message.reactions.push({
         uuid: v4(),
-        value: faker.internet.emoji(),
+        value: faker.internet.emoji({ types: ["smiley", "flag", "food"] }),
       });
     }
 
