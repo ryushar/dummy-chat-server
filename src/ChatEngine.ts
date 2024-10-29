@@ -16,9 +16,9 @@ const ChatEngine = new (class {
     this._messages = [];
     this._messagesMap = {};
     this._mainParticipant = {
-      uuid: "main",
+      uuid: "you",
       name: "You",
-      avatarUrl: "",
+      avatarUrl: faker.image.urlLoremFlickr(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -89,7 +89,7 @@ const ChatEngine = new (class {
       attachments: [],
       sentAt: Date.now(),
       updatedAt: Date.now(),
-      authorUuid: "main",
+      authorUuid: "you",
       reactions: [],
     };
 
@@ -103,8 +103,7 @@ const ChatEngine = new (class {
   }
 
   private _main(): void {
-    if (this._tick % 60 === 0) {
-      console.log(60);
+    if (this._tick % 600 === 0) {
       this._createRandomMessage();
     }
 
@@ -203,7 +202,7 @@ const ChatEngine = new (class {
     const message = this._messages[index];
     const random = Math.random();
 
-    if (random < 0.5) {
+    if (random < 0.7 || message.reactions.length >= 10) {
       message.text = faker.lorem.sentence({ min: 1, max: 40 });
     } else {
       message.reactions.push({
