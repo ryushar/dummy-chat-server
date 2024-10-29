@@ -41,8 +41,8 @@ apiRouter.post("/messages/new/", (req, res) => {
     res.sendStatus(400);
     return;
   }
-  ChatEngine.addNewMessage(req.body.text);
-  res.json({ success: true });
+  const message = ChatEngine.addNewMessage(req.body.text);
+  res.json(message);
 });
 
 apiRouter.get("/participants/all", (_req, res) => {

@@ -11,6 +11,9 @@ const ChatEngine = new (class {
         this._mainParticipant = {
             uuid: "you",
             name: "You",
+            bio: faker_1.faker.person.bio(),
+            email: faker_1.faker.internet.email(),
+            jobTitle: faker_1.faker.person.jobTitle(),
             avatarUrl: faker_1.faker.image.urlLoremFlickr(),
             createdAt: Date.now(),
             updatedAt: Date.now(),
@@ -32,7 +35,7 @@ const ChatEngine = new (class {
             this._createRandomParticipant();
         }
         for (let i = 0; i < 50; i++) {
-            this._createRandomMessage();
+            this._createRandomMessage(i);
         }
     }
     getSessionUuid() {
@@ -80,6 +83,7 @@ const ChatEngine = new (class {
         }
         this._messages.push(message);
         this._messagesMap[message.uuid] = message;
+        return message;
     }
     _main() {
         if (this._tick % 600 === 0) {
@@ -140,7 +144,7 @@ const ChatEngine = new (class {
         };
         return attachment;
     }
-    _createRandomMessage() {
+    _createRandomMessage(delay = 0) {
         const authorIndex = Math.floor(Math.random() * this._participants.length);
         const author = this._participants[authorIndex];
         const message = {
@@ -149,14 +153,14 @@ const ChatEngine = new (class {
             attachments: [],
             authorUuid: author.uuid,
             reactions: [],
-            sentAt: Date.now(),
-            updatedAt: Date.now(),
+            sentAt: Date.now() + delay,
+            updatedAt: Date.now() + delay,
         };
         if (Math.random() < 0.05) {
             const attachment = this._createRandomAttachment();
             message.attachments.push(attachment);
         }
-        if (Math.random() < 0.05) {
+        if (Math.random() < 0.05 && this._messages.length > 0) {
             const index = Math.floor(Math.random() * this._messages.length);
             const replyToMessage = this._messages[index];
             message.replyToMessageUuid = replyToMessage.uuid;
@@ -183,6 +187,9 @@ const ChatEngine = new (class {
         const participant = {
             uuid: (0, uuid_1.v4)(),
             name: faker_1.faker.person.fullName(),
+            bio: faker_1.faker.person.bio(),
+            email: faker_1.faker.internet.email(),
+            jobTitle: faker_1.faker.person.jobTitle(),
             createdAt: Date.now(),
             updatedAt: Date.now(),
             avatarUrl: faker_1.faker.image.urlLoremFlickr(),

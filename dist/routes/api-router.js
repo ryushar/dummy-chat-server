@@ -35,8 +35,8 @@ apiRouter.post("/messages/new/", (req, res) => {
         res.sendStatus(400);
         return;
     }
-    ChatEngine_1.default.addNewMessage(req.body.text);
-    res.json({ success: true });
+    const message = ChatEngine_1.default.addNewMessage(req.body.text);
+    res.json(message);
 });
 apiRouter.get("/participants/all", (_req, res) => {
     const participants = ChatEngine_1.default.getAllParticipants();

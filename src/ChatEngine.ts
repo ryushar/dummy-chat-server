@@ -18,6 +18,9 @@ const ChatEngine = new (class {
     this._mainParticipant = {
       uuid: "you",
       name: "You",
+      bio: faker.person.bio(),
+      email: faker.internet.email(),
+      jobTitle: faker.person.jobTitle(),
       avatarUrl: faker.image.urlLoremFlickr(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -42,7 +45,7 @@ const ChatEngine = new (class {
     }
 
     for (let i = 0; i < 50; i++) {
-      this._createRandomMessage();
+      this._createRandomMessage(i);
     }
   }
 
@@ -82,7 +85,7 @@ const ChatEngine = new (class {
     return this._fillReplyToMessage(messages);
   }
 
-  addNewMessage(text: string): void {
+  addNewMessage(text: string): TMessage {
     const message: TMessage = {
       uuid: v4(),
       text,
@@ -100,6 +103,8 @@ const ChatEngine = new (class {
 
     this._messages.push(message);
     this._messagesMap[message.uuid] = message;
+
+    return message;
   }
 
   private _main(): void {
@@ -168,7 +173,7 @@ const ChatEngine = new (class {
     return attachment;
   }
 
-  private _createRandomMessage(): void {
+  private _createRandomMessage(delay = 0): void {
     const authorIndex = Math.floor(Math.random() * this._participants.length);
     const author = this._participants[authorIndex];
 
@@ -178,8 +183,8 @@ const ChatEngine = new (class {
       attachments: [],
       authorUuid: author.uuid,
       reactions: [],
-      sentAt: Date.now(),
-      updatedAt: Date.now(),
+      sentAt: Date.now() + delay,
+      updatedAt: Date.now() + delay,
     };
 
     if (Math.random() < 0.05) {
@@ -187,7 +192,7 @@ const ChatEngine = new (class {
       message.attachments.push(attachment);
     }
 
-    if (Math.random() < 0.05) {
+    if (Math.random() < 0.05 && this._messages.length > 0) {
       const index = Math.floor(Math.random() * this._messages.length);
       const replyToMessage = this._messages[index];
       message.replyToMessageUuid = replyToMessage.uuid;
@@ -218,6 +223,9 @@ const ChatEngine = new (class {
     const participant: TParticipant = {
       uuid: v4(),
       name: faker.person.fullName(),
+      bio: faker.person.bio(),
+      email: faker.internet.email(),
+      jobTitle: faker.person.jobTitle(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
       avatarUrl: faker.image.urlLoremFlickr(),
