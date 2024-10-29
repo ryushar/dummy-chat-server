@@ -4,6 +4,7 @@ const uuid_1 = require("uuid");
 const faker_1 = require("@faker-js/faker");
 const ChatEngine = new (class {
     constructor() {
+        this._sessionUuid = (0, uuid_1.v4)();
         this._participants = [];
         this._messages = [];
         this._messagesMap = {};
@@ -34,6 +35,9 @@ const ChatEngine = new (class {
             this._createRandomMessage();
         }
     }
+    getSessionUuid() {
+        return this._sessionUuid;
+    }
     getAllParticipants() {
         const participants = [this._mainParticipant, ...this._participants];
         return participants;
@@ -54,13 +58,32 @@ const ChatEngine = new (class {
         return this._fillReplyToMessage(messages);
     }
     getOlderMessages(messageUuid) {
-        const endIndex = this._messages.findIndex((m) => m.uuid === messageUuid);
+        const index = this._messages.findIndex((m) => m.uuid === messageUuid);
+        const endIndex = Math.max(0, index);
         const startIndex = Math.max(0, endIndex - 25);
         const messages = this._messages.slice(startIndex, endIndex);
         return this._fillReplyToMessage(messages);
     }
+    addNewMessage(text) {
+        const message = {
+            uuid: (0, uuid_1.v4)(),
+            text,
+            attachments: [],
+            sentAt: Date.now(),
+            updatedAt: Date.now(),
+            authorUuid: "main",
+            reactions: [],
+        };
+        if (Math.random() < 0.5) {
+            const attachment = this._createRandomAttachment();
+            message.attachments.push(attachment);
+        }
+        this._messages.push(message);
+        this._messagesMap[message.uuid] = message;
+    }
     _main() {
         if (this._tick % 60 === 0) {
+            console.log(60);
             this._createRandomMessage();
         }
         if (this._tick % 30 === 0) {
@@ -72,6 +95,7 @@ const ChatEngine = new (class {
         if (this._tick % 600 === 0) {
             this._updateRandomParticipant();
         }
+        this._tick++;
     }
     _fillReplyToMessage(messages) {
         return messages.map((message) => {

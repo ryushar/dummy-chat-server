@@ -2,6 +2,7 @@ import { v4 } from "uuid";
 import { faker } from "@faker-js/faker";
 
 const ChatEngine = new (class {
+  private _sessionUuid: string;
   private _participants: TParticipant[];
   private _messages: TMessage[];
   private _messagesMap: Record<string, TMessage>;
@@ -10,6 +11,7 @@ const ChatEngine = new (class {
   private _loop: NodeJS.Timeout | null;
 
   constructor() {
+    this._sessionUuid = v4();
     this._participants = [];
     this._messages = [];
     this._messagesMap = {};
@@ -44,6 +46,10 @@ const ChatEngine = new (class {
     }
   }
 
+  getSessionUuid(): string {
+    return this._sessionUuid;
+  }
+
   getAllParticipants(): TParticipant[] {
     const participants = [this._mainParticipant, ...this._participants];
     return participants;
@@ -69,14 +75,36 @@ const ChatEngine = new (class {
   }
 
   getOlderMessages(messageUuid: string): TMessage[] {
-    const endIndex = this._messages.findIndex((m) => m.uuid === messageUuid);
+    const index = this._messages.findIndex((m) => m.uuid === messageUuid);
+    const endIndex = Math.max(0, index);
     const startIndex = Math.max(0, endIndex - 25);
     const messages = this._messages.slice(startIndex, endIndex);
     return this._fillReplyToMessage(messages);
   }
 
+  addNewMessage(text: string): void {
+    const message: TMessage = {
+      uuid: v4(),
+      text,
+      attachments: [],
+      sentAt: Date.now(),
+      updatedAt: Date.now(),
+      authorUuid: "main",
+      reactions: [],
+    };
+
+    if (Math.random() < 0.5) {
+      const attachment = this._createRandomAttachment();
+      message.attachments.push(attachment);
+    }
+
+    this._messages.push(message);
+    this._messagesMap[message.uuid] = message;
+  }
+
   private _main(): void {
     if (this._tick % 60 === 0) {
+      console.log(60);
       this._createRandomMessage();
     }
 
@@ -91,6 +119,8 @@ const ChatEngine = new (class {
     if (this._tick % 600 === 0) {
       this._updateRandomParticipant();
     }
+
+    this._tick++;
   }
 
   private _fillReplyToMessage(messages: TMessage[]): TMessageJSON[] {

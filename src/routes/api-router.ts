@@ -5,6 +5,12 @@ const apiRouter = Router();
 
 apiRouter.use(json());
 
+apiRouter.get("/info", (_req, res) => {
+  const sessionUuid = ChatEngine.getSessionUuid();
+  const apiVersion = 1;
+  res.json({ sessionUuid, apiVersion });
+});
+
 apiRouter.get("/messages/all", (_req, res) => {
   const messages = ChatEngine.getAllMessages();
   res.json(messages);
@@ -22,8 +28,21 @@ apiRouter.get("/messages/older/:uuid", (req, res) => {
 
 apiRouter.get("/messages/updates/:time", (req, res) => {
   const time = parseInt(req.params.time, 10);
+  if (!time) {
+    res.sendStatus(400);
+    return;
+  }
   const messages = ChatEngine.getMessageUpdates(time);
   res.json(messages);
+});
+
+apiRouter.post("/messages/new/", (req, res) => {
+  if (typeof req.body?.text !== "string") {
+    res.sendStatus(400);
+    return;
+  }
+  ChatEngine.addNewMessage(req.body.text);
+  res.json({ success: true });
 });
 
 apiRouter.get("/participants/all", (_req, res) => {
@@ -33,6 +52,10 @@ apiRouter.get("/participants/all", (_req, res) => {
 
 apiRouter.get("/participants/updates/:time", (req, res) => {
   const time = parseInt(req.params.time, 10);
+  if (!time) {
+    res.sendStatus(400);
+    return;
+  }
   const participants = ChatEngine.getParticipantUpdates(time);
   res.json(participants);
 });
